@@ -1,4 +1,4 @@
-![img_1.png](img/img_1.png)
+![img_1.png](https://cdn.jsdelivr.net/gh/yuuuuu422/Myimages/img/2021/07/20210727225352.gif)
 
 # Gopo
 
