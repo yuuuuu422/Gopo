@@ -4,7 +4,7 @@ import "Gopo/utils"
 
 const pocName2 = "Log4j2-cve-2021-44228"
 
-var header = `
+var log4j2header = `
 Accept-Charset
 Accept-Datetime
 Accept-Encoding
@@ -101,12 +101,12 @@ X-Wap-Profile
 X-WAP-Profile
 X-XSRF-TOKEN`
 
-func init(){
-	scriptRegister(pocName2,log4j2)
+func init() {
+	scriptRegister(pocName2, log4j2)
 }
 
-func log4j2(target string){
-	utils.Debug(pocName2,target)
+func log4j2(target string) {
+	utils.Debug(pocName2, target)
 }
 
 /*

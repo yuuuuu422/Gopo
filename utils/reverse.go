@@ -14,6 +14,7 @@ import (
 	"strings"
 	"time"
 )
+
 var (
 	ceyeApi    string
 	ceyeDomain string
@@ -21,31 +22,31 @@ var (
 
 type ceye struct {
 	Domain string `yaml:"domain"`
-	Api string `yaml:"api"`
+	Api    string `yaml:"api"`
 }
 
-func InitCeyeApi() bool{
-	yamlFile,err:=ioutil.ReadFile("config.yml")
-	if err!=nil{
+func InitCeyeApi() bool {
+	yamlFile, err := ioutil.ReadFile("config.yml")
+	if err != nil {
 		Error(err)
 		return false
 	}
-	c:=&ceye{}
-	err =yaml.Unmarshal(yamlFile,c)
-	if err!=nil{
+	c := &ceye{}
+	err = yaml.Unmarshal(yamlFile, c)
+	if err != nil {
 		Error(err)
 		return false
 	}
-	if c.Api==""||c.Domain=="" {
+	if c.Api == "" || c.Domain == "" {
 		return false
 	}
-	ceyeApi=c.Api
-	ceyeDomain=c.Domain
+	ceyeApi = c.Api
+	ceyeDomain = c.Domain
 	return true
 }
 
 func newReverse() *proto.Reverse {
-	flag := RandomStr(8)
+	flag := RandLetters(8)
 	if ceyeDomain == "" {
 		return &proto.Reverse{}
 	}
@@ -69,9 +70,9 @@ func reverseCheck(r *proto.Reverse, timeout int64) bool {
 	sub := strings.ToLower(r.Flag)
 	urlStr := fmt.Sprintf("http://api.ceye.io/v1/records?token=%s&type=dns&filter=%s", ceyeApi, sub)
 	hr, _ := http.NewRequest("GET", urlStr, nil)
-	req:=&xhttp.Request{RawRequest: hr}
-	ctx:=context.Background()
-	oResp,err:= Client.Do(ctx,req)
+	req := &xhttp.Request{RawRequest: hr}
+	ctx := context.Background()
+	oResp, err := Client.Do(ctx, req)
 	if err != nil {
 		Error(err)
 		return false
@@ -82,13 +83,17 @@ func reverseCheck(r *proto.Reverse, timeout int64) bool {
 	return false
 }
 
-func RandomStr(n int) string {
+const letterBytes = "abcdefghijklmnopqrstuvwxyz"
+const letterNumberBytes = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+const lowletterNumberBytes = "0123456789abcdefghijklmnopqrstuvwxyz"
+
+func RandFromChoices(n int, choices string) string {
+
 	randSource := rand.New(rand.NewSource(time.Now().Unix()))
 	const (
 		letterIdxBits = 6                    // 6 bits to represent a letter index
 		letterIdxMask = 1<<letterIdxBits - 1 // All 1-bits, as many as letterIdxBits
 		letterIdxMax  = 63 / letterIdxBits   // # of letter indices fitting in 63 bits
-		letterBytes   = "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	)
 	randBytes := make([]byte, n)
 	for i, cache, remain := n-1, randSource.Int63(), letterIdxMax; i >= 0; {
@@ -96,11 +101,27 @@ func RandomStr(n int) string {
 			cache, remain = randSource.Int63(), letterIdxMax
 		}
 		if idx := int(cache & letterIdxMask); idx < len(letterBytes) {
-			randBytes[i] = letterBytes[idx]
+			randBytes[i] = choices[idx]
 			i--
 		}
 		cache >>= letterIdxBits
 		remain--
 	}
 	return string(randBytes)
+
+}
+
+// RandLetters 随机小写字母
+func RandLetters(n int) string {
+	return RandFromChoices(n, letterBytes)
+}
+
+// RandLetterNumbers 随机大小写字母和数字
+func RandLetterNumbers(n int) string {
+	return RandFromChoices(n, letterNumberBytes)
+}
+
+// RandLowLetterNumber 随机小写字母和数字
+func RandLowLetterNumber(n int) string {
+	return RandFromChoices(n, lowletterNumberBytes)
 }
