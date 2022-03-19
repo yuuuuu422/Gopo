@@ -7,7 +7,7 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"encoding/base64"
-	"github.com/jweny/xhttp"
+	"github.com/xiecat/xhttp"
 	"net/http"
 	"strings"
 	"sync"

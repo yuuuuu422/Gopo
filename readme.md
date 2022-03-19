@@ -1,15 +1,7 @@
 ![img_1.png](https://cdn.jsdelivr.net/gh/yuuuuu422/Myimages/img/2021/07/20210727225352.gif)
 
 # Gopo
-
-## Features
-
-你可以用它来渗透测试，不过我保证绝对没有市面上绝大多数工具好用...
-
-仅仅当作个人学习，用了一些好的项目，不自己造轮子还是感觉手痒
-
-尽可能去支持v2的xray Poc，再自定义一些遇到的script 嗯差不多就这样
-
+a poc framework supported for [XRAY V2's Poc](https://docs.xray.cool/#/guide/poc/v2) and custom script.
 ## Usage
 
 ### rule
@@ -25,10 +17,15 @@ OPTIONS:
    --cookie value               http cookie
    --httpDebug                  http debug (default: false)
    --debug                      set the log debug level (default: false)
+   --ticker                     set the time ticker to add the Task (default: false)
    --help, -h                   show help (default: false)
 ```
 
 ![img.png](img/img.png)
+
+如果多个poc使用了反连，请加上`--ticker`设置1秒的发包间隔，因为反连平台前的随机前缀是根据时间戳创建的，同一时间发包会造成误报。
+
+![img.png](img/img2.png)
 
 ### script
 ```
@@ -45,8 +42,16 @@ OPTIONS:
 
 ![img.png](img/img_2.png)
 
+![img.png](img/img3.png)
+
 ## TODO
-- [ ] 目前来看，rule在逻辑处理上还有很大的问题 比如以下情况
+
+- [ ] set目前使用的类型是`map[string]string`，可能`map[string]interface{}`会更全面一些。
+- [ ] script之间的并发处理
+- [x] shiro & fastjson
+- [ ] fastjson 全绕过
+- [ ] spring RCE
+- [ ] 执行决策方面，比如：
 
 ```yaml
 rules:
@@ -56,30 +61,20 @@ rules:
   r1:
     ...
     expression: ...
-expression: r0() && r1()
+expression: r0() || r1()
 ```
-理想状态，应该在env创建时，把键名对应的函数注册，最后解析最外层expression时，再逐一执行。
-
-问题是，注册函数时，function就已经需要传入env参数，这就有一个先鸡还是先蛋的问题了，于是干脆换了写法，一个一个rule全部执行完，再一起`Evaluate()`一次
-
-两者的区别就在于，前者是按照最外层expression的顺序执行，后者是按照rule写的顺序执行。
 
 通过xray的文档可以看到
 
 >rule 的执行顺序是按照该逻辑表达式的执行顺序来执行的
 >短路求值, 即 r1() || r2(), 如果 r1() 的结果为 true 那么 r2 是不会执行的
 
-这一部分可能得重写
-
-- [ ] rule的set目前是map[string]string，后续完善为map[string]interface{},这样带有一些爆破性质的script，也可以用rule解决。
-- [ ] 整理struts2和weblogic相关的rule，补充完善cel的function
-- [ ] script现在还只是url遍历执行，并发效果不好，协程之间的控制也不行。
-- [ ] 总结一下shiro反序列化以及fastjson的检测script 学习 ==> 产出
+但在cel注册函数时，就已经需要传入env参数，所以我目前解决的方式还是按rules依次执行，最后判断expression。
 
 ## Reference
 
 - 项目主要逻辑参考 https://github.com/jjf012/gopoc 
 
-- 部分实现参考 https://github.com/jweny/pocassist 
+- 部分实现参考 https://github.com/xiecat/pocassist 
 - 文档参考 https://docs.xray.cool/#/guide/poc/v2
 - cel相关学习 https://codelabs.developers.google.com/codelabs/cel-go/#0

@@ -4,7 +4,8 @@ import (
 	"Gopo/utils"
 	"context"
 	"fmt"
-	"github.com/jweny/xhttp"
+	"github.com/xiecat/xhttp"
+
 	"net/http"
 	"sync"
 )

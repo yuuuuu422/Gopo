@@ -1,1 +1,1 @@
-http://ty.com:8081/samples_web_war/login.jsp
+localhost:8081/samples_web_war/login.jsp

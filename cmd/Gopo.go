@@ -12,13 +12,13 @@ import (
 const (
 	AUTHOR  = "Theoyu"
 	VERSION = "0.1.0"
-	EMAIL = "zeyu.ou@foxmail.com"
+	EMAIL   = "zeyu.ou@foxmail.com"
 )
 
 var (
 	pocFile    string
 	pocRules   string
-	pocScript string
+	pocScript  string
 	target     string
 	targetFile string
 	targets    []string
@@ -28,12 +28,12 @@ var (
 	cookie    string
 	httpDebug bool
 	debug     bool
-
+	ticker    bool
 )
 
 func Hacking() {
 	app := &cli.App{
-		Name:    "Gopo",
+		Name: "Gopo",
 		//UsageText: "hhh",
 		Version: VERSION,
 		Authors: []*cli.Author{
@@ -106,10 +106,16 @@ func Hacking() {
 						Value:       false,
 						Usage:       "set the log debug level",
 					},
+					&cli.BoolFlag{
+						Name:        "ticker",
+						Destination: &ticker,
+						Value:       false,
+						Usage:       "set the time ticker to add the Task",
+					},
 				},
 				Action: func(newContext *cli.Context) error {
 					utils.InitLog(debug)
-					if !utils.InitCeyeApi(){
+					if !utils.InitCeyeApi() {
 						utils.Warning("init ceye platform false")
 					}
 					switch {
@@ -140,7 +146,7 @@ func Hacking() {
 					if err != nil {
 						return err
 					}
-					utils.CheckVuls(pocs, targets, num)
+					utils.CheckVuls(pocs, targets, num, ticker)
 					return nil
 				},
 			},
@@ -198,7 +204,7 @@ func Hacking() {
 				},
 				Action: func(context *cli.Context) error {
 					utils.InitLog(debug)
-					if !utils.InitCeyeApi(){
+					if !utils.InitCeyeApi() {
 						utils.Warning("init ceye platform false")
 					}
 					err := utils.InitHttp(cookie, proxy, httpDebug)
@@ -215,13 +221,13 @@ func Hacking() {
 						}
 						targets = append(targets, target)
 					}
-					scriptFunc:= scripts.ScriptInit(pocScript,num)
-					if scriptFunc == nil{
+					scriptFunc := scripts.ScriptInit(pocScript, num)
+					if scriptFunc == nil {
 						utils.Yellow("Unsupported script,Please check the list:")
 						scripts.ShowRegister()
 						return nil
 					}
-					for _,target=range targets{
+					for _, target = range targets {
 						scriptFunc(target)
 					}
 					return nil
@@ -233,6 +239,6 @@ func Hacking() {
 	sort.Sort(cli.CommandsByName(app.Commands))
 	err := app.Run(os.Args)
 	if err != nil {
-		utils.Yellow("%v",err)
+		utils.Yellow("%v", err)
 	}
 }

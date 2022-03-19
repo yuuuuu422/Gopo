@@ -5,7 +5,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"github.com/jweny/xhttp"
+	"github.com/xiecat/xhttp"
 	"gopkg.in/yaml.v3"
 	"io/ioutil"
 	"math/rand"

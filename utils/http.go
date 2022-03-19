@@ -2,25 +2,28 @@ package utils
 
 import (
 	"Gopo/utils/proto"
-	"github.com/jweny/xhttp"
+	"github.com/xiecat/xhttp"
 	"net/url"
 	"strings"
 )
 
 var Client *xhttp.Client
 
-func InitHttp(cookie string,proxy string,debug bool) error {
+func InitHttp(cookie string, proxy string, debug bool) error {
 	var err error
-	options := xhttp.NewDefaultClientOptions()
-	if proxy!=""{
-		if strings.HasPrefix(proxy, "http://") || strings.HasPrefix(proxy, "https://") {}else {proxy="http://"+proxy }
-		options.Proxy=proxy
+	options := xhttp.DefaultClientOptions()
+	if proxy != "" {
+		if strings.HasPrefix(proxy, "http://") || strings.HasPrefix(proxy, "https://") {
+		} else {
+			proxy = "http://" + proxy
+		}
+		options.Proxy = proxy
 	}
-	if cookie!=""{
-		options.Headers["Cookie"]=cookie
+	if cookie != "" {
+		options.Headers["Cookie"] = cookie
 	}
-	options.Debug=debug
-	Client,err = xhttp.NewClient(options,nil)
+	options.Debug = debug
+	Client, err = xhttp.NewClient(options, nil)
 	return err
 }
 
@@ -47,7 +50,7 @@ func ParseUrl(u *url.URL) *proto.UrlType {
 
 func ParseResponse(xResp *xhttp.Response) *proto.Response {
 	var resp proto.Response
-	oResp:=xResp.RawResponse
+	oResp := xResp.RawResponse
 	header := make(map[string]string)
 	resp.Status = int32(oResp.StatusCode)
 	resp.Url = ParseUrl(oResp.Request.URL)
@@ -56,7 +59,7 @@ func ParseResponse(xResp *xhttp.Response) *proto.Response {
 	}
 	resp.Headers = header
 	//resp.ContentType = oResp.Header.Get("Content-Type")
-	resp.Body=xResp.Body
+	resp.Body = xResp.Body
 	return &resp
 }
 
